@@ -5,29 +5,25 @@ import java.util.List;
 
 public class OptimizeIncentiveValue {
 
-    public static int getMaxValue(int budget, List<Incentive> incentives){
+    public static int getMaxValue(int budget, List<Incentive> incentives) {
 
         int totalRunningCost = 0;
         int maxValue = Integer.MIN_VALUE;
         int runningValue = 0;
 
-        int startingWindow = 0;
-
-        for (Incentive currentIncentive : incentives) {
-            runningValue += currentIncentive.getValue();
-            totalRunningCost += currentIncentive.getCost();
-
-            while (totalRunningCost > budget) {
-                Incentive removeIncentive = incentives.get(startingWindow);
-                totalRunningCost -= removeIncentive.getCost();
-                runningValue -= removeIncentive.getValue();
-                startingWindow++;
+        for (int i = 0; i < incentives.size(); i++) {
+            Incentive startIncentive = incentives.get(i);
+            totalRunningCost = startIncentive.getCost();
+            runningValue = startIncentive.getValue();
+            for (int j = i + 1; j < incentives.size(); j++) {
+                Incentive nextIncentive = incentives.get(j);
+                if (totalRunningCost + nextIncentive.getCost() <= budget) {
+                    totalRunningCost += nextIncentive.getCost();
+                    runningValue += nextIncentive.getValue();
+                    maxValue = Math.max(runningValue, maxValue);
+                }
             }
-
-            maxValue = Math.max(maxValue, runningValue);
-
         }
-
         System.out.println("Congratulations, you have received $" + maxValue + " in incentives");
         return maxValue;
     }
@@ -37,11 +33,12 @@ public class OptimizeIncentiveValue {
         int value;
         int cost;
 
-        public Incentive (String name, int value, int cost) {
+        public Incentive(String name, int value, int cost) {
             this.name = name;
             this.value = value;
             this.cost = cost;
         }
+
         public String getName() {
             return this.name;
         }
@@ -56,12 +53,6 @@ public class OptimizeIncentiveValue {
     }
 
     public static void main(String[] args) {
-        Incentive bagIncentive = new Incentive(
-                "Checked Bag",
-                100,
-                60
-        );
-
         Incentive mealIncentive = new Incentive(
                 "Meal",
                 45,
@@ -74,7 +65,20 @@ public class OptimizeIncentiveValue {
                 40
         );
 
-        List<Incentive> incentives = Arrays.asList(bagIncentive, mealIncentive, upgradeIncentive);
+        Incentive bagIncentive = new Incentive(
+                "Checked Bag",
+                100,
+                60
+        );
+
+
+        Incentive drinkIncentive = new Incentive(
+                "drink",
+                20,
+                5
+        );
+
+        List<Incentive> incentives = Arrays.asList(mealIncentive,bagIncentive, upgradeIncentive, drinkIncentive);
         int budget = 75;
         System.out.println(OptimizeIncentiveValue.getMaxValue(budget, incentives));
     }
